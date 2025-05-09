@@ -62,6 +62,46 @@ a threshold on the number of SDs away from the mean used to define outliers.
 ```{r}
 #| label: exercise-1
 
+remove_outliers <- function(df, ..., sd_thresh = 3){
+  
+  #error cases for df and sd_thresh
+  if (!is.data.frame(df)) {
+    stop("df must be a data frame please!!!!!!!")
+  }
+  if (!is.numeric(sd_thresh) | sd_thresh <= 0) {
+    stop("sd_thresh has to be a positive number please!!!!!!")
+  }
+  
+  #turn everything in ellipses to quosures
+  names_quosures <- enquos(...)
+  #take everything in names_quosures and extracts the names as character strings
+  names <- map_chr(names_quosures, quo_name)
+  
+  #error cases for the names/...
+  if (length(names) < 1) {
+    stop("provide column names to remove outliers from please bro")
+  }
+  if (!is.character(names)) {
+    stop("column names must be character strings!! ")
+  }
+  if (!all(names %in% names(df))) {
+    stop("the column(s) are not in the data frame :(")
+  }
+  
+  #meat of the function. check if the col is numeric, calc z score and then 
+  df_RO <- df
+  for (name in names) {
+    if (!is.numeric(df_RO[[name]])) {
+      warning(paste("Skipping non-numeric column ", name))
+    }
+    mean <- mean(df_RO[[name]], na.rm = TRUE)
+    sd <- sd(df_RO[[name]], na.rm = TRUE)
+    abs_z <- abs((df_RO[[name]] - mean) / sd)
+    df_RO <- df_RO[abs_z <= sd_thresh | is.na(abs_z), ]
+  }
+  return(df_RO)
+}
+
 ```
 
 ## Testing Your Function! 
