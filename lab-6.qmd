@@ -88,11 +88,12 @@ remove_outliers <- function(df, ..., sd_thresh = 3){
     stop("the column(s) are not in the data frame :(")
   }
   
-  #meat of the function. check if the col is numeric, calc z score and then 
+  #meat of the function. check if the col is numeric, calc z score and then filter
   df_RO <- df
   for (name in names) {
     if (!is.numeric(df_RO[[name]])) {
       warning(paste("Skipping non-numeric column ", name))
+      next
     }
     mean <- mean(df_RO[[name]], na.rm = TRUE)
     sd <- sd(df_RO[[name]], na.rm = TRUE)
@@ -103,6 +104,7 @@ remove_outliers <- function(df, ..., sd_thresh = 3){
 }
 
 ```
+
 
 ## Testing Your Function! 
 
