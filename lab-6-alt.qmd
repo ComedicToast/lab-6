@@ -390,6 +390,32 @@ chart
 ```{r}
 #| label: question-11
 
+sorted_bars <- function(df, var){
+  #check if var is correct data type
+  non_char_ord <- df %>%
+    pull({{ var }}) %>%
+    (\(x)is.character(x) | is.ordered(x) | is.factor(x))
+  
+   if (!non_char_ord) {
+    stop(
+      str_c("You must use a character or factor for the `var` input!")
+      )
+  }
+  #use enquo to pull name of var
+  var_name <- rlang::as_name(enquo(var))
+  
+  df %>%
+    ggplot(aes(x = fct_infreq(as.factor({{var}})))) +
+    geom_bar() +
+    labs(
+      title = rlang::englue("Distribution of { var_name }"),
+      x = var_name,
+      y = "Count"
+    ) +
+    theme_minimal()
+}
+
+sorted_bars(diamonds, clarity)
 ```
 
 # Iteration
