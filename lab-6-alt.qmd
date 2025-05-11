@@ -186,9 +186,8 @@ For Questions 6 - 10 you will write different functions which work with data
 similar to the `nycflights13` data. 
 
 ```{r}
-
+#| include: false
 df <- head(nycflights13::flights)
-
 ```
 
 
@@ -301,18 +300,78 @@ filter_severe(flights, arr_delay, dep_delay, arr_time, hours=3)
 weather to compute the minimum, mean, and maximum, of a user supplied variable. 
 
 ```{r}
+#| include: false
+df <- head(nycflights13::weather, n=100)
+
+nrow(nycflights13::weather)
+```
+
+
+```{r}
 #| label: question-9
 
+summarize_weather <- function(df, variable){
+  
+  non_num <- df %>%
+    pull( {{ variable }}) %>%
+    is.numeric()
+  
+   if (!non_num) {
+    stop(
+      str_c("You must use a numeric variable for the `variable` input!")
+      )
+  }
+  
+  df %>%
+    summarize(
+      min = min({{variable}}, na.rm = TRUE),
+      mean = mean({{variable}}, na.rm = TRUE),
+      max = max({{variable}}, na.rm=TRUE)
+    )
+    
+}
+
+summarize_weather(weather, temp)
 ```
+
+
 
 **Question 10:** Write a `standardize_time()` function that converts the user
 supplied variable that uses clock time (e.g., `dep_time`, `arr_time`, etc.) into
 a decimal time (i.e. hours + (minutes / 60)).
 
 ```{r}
+#| include: false
+df <- head(nycflights13::flights, n=1000)
+```
+
+```{r}
 #| label: question-10
+standardize_time <- function(df, clock_time){
+  non_num <- df %>%
+    pull({{ clock_time }}) %>%
+    is.numeric()
+  
+   if (!non_num) {
+    stop(
+      str_c("You must use a numeric variable for the `clock_time` input!")
+      )
+  }
+  
+  df %>%
+    mutate(
+      {{clock_time}} := case_when(
+        !is.na({{clock_time}}) ~ floor({{clock_time}}/100) + ({{clock_time}} %% 100) / 60
+      )
+    )
+  
+  
+}
+
+standardize_time(flights, dep_time)
 
 ```
+
 
 # Plotting Functions
 
