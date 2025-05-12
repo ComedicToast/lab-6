@@ -2,6 +2,7 @@
 title: "Lab 6 - Alternative"
 subtitle: "Contributing to R for Data Science"
 editor: source
+embed-resources: true
 ---
 
 The exercises from the functions below were pulled from the newest version of
