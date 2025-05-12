@@ -387,6 +387,8 @@ chart
 *Hint 1: The `fct_infreq()` and `fct_rev()` functions from the forcats package will be helpful for sorting the bars!*
 *Hint 2: The `englue()` function from the rlang package will be helpful for adding a variable's name into the plot title!*
 
+I also made it so that if a variable had more than 10 unique values, the bar chart would be horizontal since the names of each category tend to blend together when the bar chart is vertical.
+
 ```{r}
 #| label: question-11
 
@@ -404,7 +406,10 @@ sorted_bars <- function(df, var){
   #use enquo to pull name of var
   var_name <- rlang::as_name(enquo(var))
   
-  df %>%
+  #count unique # of columns to determine if coord flipping later
+  total_vals <- n_distinct(df %>% pull({{ var }}))
+  
+  p <- df %>%
     ggplot(aes(x = fct_infreq(as.factor({{var}})))) +
     geom_bar() +
     labs(
@@ -412,7 +417,16 @@ sorted_bars <- function(df, var){
       x = var_name,
       y = "Count"
     ) +
-    theme_minimal()
+    theme_minimal() +
+    theme(
+      panel.grid.major.x = element_blank()
+    )
+  
+  if (total_vals > 10) {
+    p <- p + coord_flip()
+  }
+  
+  return(p)
 }
 
 sorted_bars(diamonds, clarity)
@@ -428,6 +442,11 @@ dataset (built into `ggplot2`).
 ```{r}
 #| label: question-12
 
+char_vars <- mpg %>%
+  select(where(is.character)) %>%
+  names()
+
+map(char_vars, ~sorted_bars(mpg, !!sym(.x)))
 ```
 
 # Contributing to the R for Data Science Community!
